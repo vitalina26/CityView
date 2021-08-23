@@ -21,10 +21,10 @@ namespace CityView.Controllers
         // GET: Events
         public async Task<IActionResult> Index(int? id, string? name)
         {
-            if (id == null) return RedirectToAction("Cities", "Index");
+            if (id == null) return RedirectToAction("Index", "Cities");
             ViewBag.CityId = id;
-            ViewBag.CategoryName = name;
-            var eventsByCity = _context.Events.Where(b=>b.CityId == id ).Include(b => b.City);
+            ViewBag.CityName = name;
+            var eventsByCity = _context.Events.Where(b => b.CityId == id).Include(b => b.City);
             return View(await eventsByCity.ToListAsync());
         }
 
@@ -36,15 +36,16 @@ namespace CityView.Controllers
                 return NotFound();
             }
 
-            var @event = await _context.Events
+            var _event = await _context.Events
                 .Include(b => b.City)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (@event == null)
+            if (_event == null)
             {
                 return NotFound();
             }
 
-            return View(@event);
+            //return View(_event);
+            return RedirectToAction("Index", "EventComments", new { id = _event.Id, name = _event.Name });
         }
 
         // GET: Events/Create
@@ -52,7 +53,7 @@ namespace CityView.Controllers
         {
             //ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name");
             ViewBag.CityId = cityId;
-            ViewBag.CityId = _context.Cities.Where(c => c.Id == cityId).FirstOrDefault().Name;
+            ViewBag.CityName = _context.Cities.Where(c => c.Id == cityId).FirstOrDefault().Name;
 
             return View();
         }
@@ -62,19 +63,17 @@ namespace CityView.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int cityId, [Bind("Id,Name,DescriptionInfo,Contacts,Address,EventDay,CityId")] Event @event)
+        public async Task<IActionResult> Create([Bind("Id,Name,DescriptionInfo,Contacts,Address,EventDay,CityId")] Event _event)
         {
-            @event.CityId = cityId;
             if (ModelState.IsValid)
             {
-                _context.Add(@event);
+                _context.Add(_event);
                 await _context.SaveChangesAsync();
-                //  return RedirectToAction(nameof(Index));
-                return RedirectToAction("Index", "Events", new { id = cityId, name = _context.Cities.Where(c => c.Id == cityId).FirstOrDefault().Name });
+                
+                return RedirectToAction("Index", "Events", new { id = _event.CityId, name = _context.Cities.Where(c => c.Id == _event.CityId).FirstOrDefault().Name });
             }
-            //  ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", @event.CityId);
-            // return View(@event);
-            return RedirectToAction("Index", "Events", new { id = cityId, name = _context.Cities.Where(c => c.Id == cityId).FirstOrDefault().Name });
+            
+            return RedirectToAction("Index", "Events", new { id = _event.CityId, name = _context.Cities.Where(c => c.Id == _event.CityId).FirstOrDefault().Name });
         }
 
         // GET: Events/Edit/5
@@ -85,13 +84,13 @@ namespace CityView.Controllers
                 return NotFound();
             }
 
-            var @event = await _context.Events.FindAsync(id);
-            if (@event == null)
+            var _event = await _context.Events.FindAsync(id);
+            if (_event == null)
             {
                 return NotFound();
             }
-            ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", @event.CityId);
-            return View(@event);
+            ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", _event.CityId);
+            return View(_event);
         }
 
         // POST: Events/Edit/5
@@ -99,9 +98,9 @@ namespace CityView.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,DescriptionInfo,Contacts,Address,EventDay,CityId")] Event @event)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,DescriptionInfo,Contacts,Address,EventDay,CityId")] Event _event)
         {
-            if (id != @event.Id)
+            if (id != _event.Id)
             {
                 return NotFound();
             }
@@ -110,12 +109,12 @@ namespace CityView.Controllers
             {
                 try
                 {
-                    _context.Update(@event);
+                    _context.Update(_event);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!EventExists(@event.Id))
+                    if (!EventExists(_event.Id))
                     {
                         return NotFound();
                     }
@@ -124,10 +123,10 @@ namespace CityView.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "EventComments", new { id = _event.Id, name = _event.Name });
             }
-            ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", @event.CityId);
-            return View(@event);
+            ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", _event.CityId);
+            return View(_event);
         }
 
         // GET: Events/Delete/5
@@ -138,15 +137,15 @@ namespace CityView.Controllers
                 return NotFound();
             }
 
-            var @event = await _context.Events
+            var _event = await _context.Events
                 .Include(b => b.City)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (@event == null)
+            if (_event == null)
             {
                 return NotFound();
             }
 
-            return View(@event);
+            return View(_event);
         }
 
         // POST: Events/Delete/5
@@ -154,10 +153,10 @@ namespace CityView.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var @event = await _context.Events.FindAsync(id);
-            _context.Events.Remove(@event);
+            var _event = await _context.Events.FindAsync(id);
+            _context.Events.Remove(_event);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "EventComments", new { id = _event.Id, name = _event.Name });
         }
 
         private bool EventExists(int id)

@@ -49,7 +49,7 @@ namespace CityView
 
                 entity.Property(e => e.DescriptionInfo).HasColumnType("ntext");
 
-                entity.Property(e => e.EventDay).HasColumnType("date");
+                entity.Property(e => e.EventDay).HasColumnType("datetime");
 
                 entity.Property(e => e.Name).HasColumnType("ntext");
 
@@ -64,7 +64,7 @@ namespace CityView
             {
                 entity.Property(e => e.Comment).HasColumnType("ntext");
 
-                entity.Property(e => e.DateOfCreation).HasColumnType("date");
+                entity.Property(e => e.DateOfCreation).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Event)
                     .WithMany(p => p.EventComments)
@@ -93,7 +93,7 @@ namespace CityView
             {
                 entity.Property(e => e.Comment).HasColumnType("ntext");
 
-                entity.Property(e => e.DateOfCreation).HasColumnType("date");
+                entity.Property(e => e.DateOfCreation).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Institution)
                     .WithMany(p => p.InstitutionComments)

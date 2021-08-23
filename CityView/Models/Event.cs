@@ -32,7 +32,6 @@ namespace CityView
         [Required(ErrorMessage = "ПОЛЕ НЕ ПОВИННО БУТИ ПОРОЖНІМ")]
         [Display(Name = "Місто")]
         public int CityId { get; set; }
-        [Required(ErrorMessage = "ПОЛЕ НЕ ПОВИННО БУТИ ПОРОЖНІМ")]
         [Display(Name = "Місто")]
 
         public virtual City City { get; set; }

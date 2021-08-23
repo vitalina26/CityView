@@ -19,10 +19,14 @@ namespace CityView.Controllers
         }
 
         // GET: Institutions
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id, string? name)
         {
-            var dayInANewCityContext = _context.Institutions.Include(i => i.City);
-            return View(await dayInANewCityContext.ToListAsync());
+            if (id == null) return RedirectToAction("Index", "Cities");
+            ViewBag.CityId = id;
+            ViewBag.CityName = name;
+            var institutionsByCity = _context.Institutions.Where(b => b.CityId == id).Include(b => b.City);
+            return View(await institutionsByCity.ToListAsync());
+           
         }
 
         // GET: Institutions/Details/5
@@ -45,9 +49,11 @@ namespace CityView.Controllers
         }
 
         // GET: Institutions/Create
-        public IActionResult Create()
+        public IActionResult Create(int cityId)
         {
-            ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name");
+            ViewBag.CityId = cityId;
+            ViewBag.CityName = _context.Cities.Where(c => c.Id == cityId).FirstOrDefault().Name;
+
             return View();
         }
 
@@ -62,10 +68,11 @@ namespace CityView.Controllers
             {
                 _context.Add(institution);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                return RedirectToAction("Index", "Events", new { id = institution.CityId, name = _context.Cities.Where(c => c.Id == institution.CityId).FirstOrDefault().Name });
             }
-            ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", institution.CityId);
-            return View(institution);
+
+            return RedirectToAction("Index", "Events", new { id = institution.CityId, name = _context.Cities.Where(c => c.Id == institution.CityId).FirstOrDefault().Name });
         }
 
         // GET: Institutions/Edit/5
@@ -115,7 +122,7 @@ namespace CityView.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Events", new { id = institution.CityId, name = _context.Cities.Where(c => c.Id == institution.CityId).FirstOrDefault().Name });
             }
             ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", institution.CityId);
             return View(institution);
@@ -148,7 +155,7 @@ namespace CityView.Controllers
             var institution = await _context.Institutions.FindAsync(id);
             _context.Institutions.Remove(institution);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Events", new { id = institution.CityId, name = _context.Cities.Where(c => c.Id == institution.CityId).FirstOrDefault().Name });
         }
 
         private bool InstitutionExists(int id)

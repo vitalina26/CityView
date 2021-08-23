@@ -43,8 +43,8 @@ namespace CityView.Controllers
             return RedirectToAction("Index", "Events", new { id = city.Id, name = city.Name });
         }
 
-        /*
-          public async Task<IActionResult> GetInstitution(int? id)
+        
+          public async Task<IActionResult> GetInstitutions(int? id)
         {
             if (id == null)
             {
@@ -63,7 +63,7 @@ namespace CityView.Controllers
         }
 
          
-         */
+         
 
         // GET: Cities/Create
         public IActionResult Create()

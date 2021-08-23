@@ -17,13 +17,17 @@ namespace CityView.Controllers
         {
             _context = context;
         }
-
+        
         // GET: EventComments
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id, string? name)
         {
-            var dayInANewCityContext = _context.EventComments.Include(e => e.Event);
-            return View(await dayInANewCityContext.ToListAsync());
+            if (id == null) return RedirectToAction("Index", "Events");
+            ViewBag.EventId = id;
+            ViewBag.EventName = name;
+            var eventCommentsByEvent = _context.EventComments.Where(b => b.EventId == id).Include(b => b.Event);
+            return View(await eventCommentsByEvent.ToListAsync());
         }
+       
 
         // GET: EventComments/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -43,11 +47,15 @@ namespace CityView.Controllers
 
             return View(eventComment);
         }
-
+        
         // GET: EventComments/Create
-        public IActionResult Create()
+        public IActionResult Create( int eventId)
         {
-            ViewData["EventId"] = new SelectList(_context.Events, "Id", "Address");
+            // ViewData["EventId"] = new SelectList(_context.Events, "Id", "Address");
+            ViewBag.EventId = eventId;
+            ViewBag.EventName = _context.Events.Where(c => c.Id == eventId).FirstOrDefault().Name;
+
+
             return View();
         }
 
@@ -56,16 +64,32 @@ namespace CityView.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        /*
+       public async Task<IActionResult> Create([Bind("Id,Name,DescriptionInfo,Contacts,Address,EventDay,CityId")] Event _event)
+       {
+           if (ModelState.IsValid)
+           {
+               _context.Add(_event);
+               await _context.SaveChangesAsync();
+
+               return RedirectToAction("Index", "Events", new { id = _event.CityId, name = _context.Cities.Where(c => c.Id == _event.CityId).FirstOrDefault().Name });
+           }
+           
+           return RedirectToAction("Index", "Events", new { id = _event.CityId, name = _context.Cities.Where(c => c.Id == _event.CityId).FirstOrDefault().Name });
+       }*/
+
         public async Task<IActionResult> Create([Bind("Id,Comment,DateOfCreation,EventId")] EventComment eventComment)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(eventComment);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "EventComments", new { id = eventComment.EventId, name = _context.Events.Where(c => c.Id == eventComment.EventId).FirstOrDefault().Name });
             }
-            ViewData["EventId"] = new SelectList(_context.Events, "Id", "Address", eventComment.EventId);
-            return View(eventComment);
+            // ViewData["EventId"] = new SelectList(_context.Events, "Id", "Address", eventComment.EventId);
+            
+            return RedirectToAction("Index", "EventComments", new { id = eventComment.EventId, name = _context.Events.Where(c => c.Id == eventComment.EventId).FirstOrDefault().Name });
+
         }
 
         // GET: EventComments/Edit/5
@@ -115,7 +139,7 @@ namespace CityView.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "EventComments", new { id = eventComment.EventId, name = _context.Events.Where(c => c.Id == eventComment.EventId).FirstOrDefault().Name });
             }
             ViewData["EventId"] = new SelectList(_context.Events, "Id", "Address", eventComment.EventId);
             return View(eventComment);
@@ -148,7 +172,7 @@ namespace CityView.Controllers
             var eventComment = await _context.EventComments.FindAsync(id);
             _context.EventComments.Remove(eventComment);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "EventComments", new { id = eventComment.EventId, name = _context.Events.Where(c => c.Id == eventComment.EventId).FirstOrDefault().Name });
         }
 
         private bool EventCommentExists(int id)
