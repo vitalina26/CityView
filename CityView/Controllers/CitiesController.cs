@@ -59,7 +59,7 @@ namespace CityView.Controllers
             }
 
             //return View(city);
-            return RedirectToAction("Index", "Institution", new { id = city.Id, name = city.Name });
+            return RedirectToAction("Index", "Institutions", new { id = city.Id, name = city.Name });
         }
 
          

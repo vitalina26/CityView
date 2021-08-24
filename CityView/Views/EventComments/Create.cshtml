@@ -22,8 +22,9 @@
                 <input asp-for="DateOfCreation" class="form-control" />
                 <span asp-validation-for="DateOfCreation" class="text-danger"></span>
             </div>
-            <input type="hidden" value="@ViewBag.EventId" name="EventId"/>
+           
             <div class="form-group">
+                <input type="hidden" value="@ViewBag.EventId" name="EventId" />
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>

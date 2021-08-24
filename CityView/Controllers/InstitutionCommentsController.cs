@@ -19,10 +19,13 @@ namespace CityView.Controllers
         }
 
         // GET: InstitutionComments
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id, string? name)
         {
-            var dayInANewCityContext = _context.InstitutionComments.Include(i => i.Institution);
-            return View(await dayInANewCityContext.ToListAsync());
+            if (id == null) return RedirectToAction("Index", "Institutions");
+            ViewBag.InstitutionId = id;
+            ViewBag.InstitutionName = name;
+            var institutionCommentsByInstitution = _context.InstitutionComments.Where(b => b.InstitutionId == id).Include(b => b.Institution);
+            return View(await institutionCommentsByInstitution.ToListAsync());
         }
 
         // GET: InstitutionComments/Details/5
@@ -45,9 +48,12 @@ namespace CityView.Controllers
         }
 
         // GET: InstitutionComments/Create
-        public IActionResult Create()
+        public IActionResult Create(int institutionId)
         {
-            ViewData["InstitutionId"] = new SelectList(_context.Institutions, "Id", "Id");
+            ViewBag.InstitutionId = institutionId;
+            ViewBag.InstitutionName = _context.Institutions.Where(c => c.Id == institutionId).FirstOrDefault().Name;
+
+
             return View();
         }
 
@@ -62,10 +68,11 @@ namespace CityView.Controllers
             {
                 _context.Add(institutionComment);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "InstitutionComments", new { id = institutionComment.InstitutionId, name = _context.Institutions.Where(c => c.Id == institutionComment.InstitutionId).FirstOrDefault().Name });
+
             }
-            ViewData["InstitutionId"] = new SelectList(_context.Institutions, "Id", "Id", institutionComment.InstitutionId);
-            return View(institutionComment);
+            return RedirectToAction("Index", "InstitutionComments", new { id = institutionComment.InstitutionId, name = _context.Institutions.Where(c => c.Id == institutionComment.InstitutionId).FirstOrDefault().Name });
+
         }
 
         // GET: InstitutionComments/Edit/5
@@ -115,7 +122,8 @@ namespace CityView.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "InstitutionComments", new { id = institutionComment.InstitutionId, name = _context.Institutions.Where(c => c.Id == institutionComment.InstitutionId).FirstOrDefault().Name });
+
             }
             ViewData["InstitutionId"] = new SelectList(_context.Institutions, "Id", "Id", institutionComment.InstitutionId);
             return View(institutionComment);
@@ -148,7 +156,8 @@ namespace CityView.Controllers
             var institutionComment = await _context.InstitutionComments.FindAsync(id);
             _context.InstitutionComments.Remove(institutionComment);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "InstitutionComments", new { id = institutionComment.InstitutionId, name = _context.Institutions.Where(c => c.Id == institutionComment.InstitutionId).FirstOrDefault().Name });
+
         }
 
         private bool InstitutionCommentExists(int id)

@@ -45,7 +45,7 @@ namespace CityView.Controllers
                 return NotFound();
             }
 
-            return View(institution);
+            return RedirectToAction("Index", "InstitutionComments", new { id = institution.Id, name = institution.Name });
         }
 
         // GET: Institutions/Create
@@ -69,10 +69,10 @@ namespace CityView.Controllers
                 _context.Add(institution);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("Index", "Events", new { id = institution.CityId, name = _context.Cities.Where(c => c.Id == institution.CityId).FirstOrDefault().Name });
+                return RedirectToAction("Index", "Institutions", new { id = institution.CityId, name = _context.Cities.Where(c => c.Id == institution.CityId).FirstOrDefault().Name });
             }
 
-            return RedirectToAction("Index", "Events", new { id = institution.CityId, name = _context.Cities.Where(c => c.Id == institution.CityId).FirstOrDefault().Name });
+            return RedirectToAction("Index", "Institutions", new { id = institution.CityId, name = _context.Cities.Where(c => c.Id == institution.CityId).FirstOrDefault().Name });
         }
 
         // GET: Institutions/Edit/5
@@ -122,7 +122,7 @@ namespace CityView.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction("Index", "Events", new { id = institution.CityId, name = _context.Cities.Where(c => c.Id == institution.CityId).FirstOrDefault().Name });
+                return RedirectToAction("Index", "Institutions", new { id = institution.CityId, name = _context.Cities.Where(c => c.Id == institution.CityId).FirstOrDefault().Name });
             }
             ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", institution.CityId);
             return View(institution);
@@ -155,7 +155,7 @@ namespace CityView.Controllers
             var institution = await _context.Institutions.FindAsync(id);
             _context.Institutions.Remove(institution);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Index", "Events", new { id = institution.CityId, name = _context.Cities.Where(c => c.Id == institution.CityId).FirstOrDefault().Name });
+            return RedirectToAction("Index", "Institutions", new { id = institution.CityId, name = _context.Cities.Where(c => c.Id == institution.CityId).FirstOrDefault().Name });
         }
 
         private bool InstitutionExists(int id)

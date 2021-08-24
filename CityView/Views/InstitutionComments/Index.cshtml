@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<CityView.InstitutionComment>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Коментарі про заклад";
 }
 
-<h1>Index</h1>
+<h1>Коментарі про заклад @ViewBag.EventName</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    @Html.ActionLink("Додати новий коментар", "Create", new { institutionId = @ViewBag.InstitutionId })
 </p>
 <table class="table">
     <thead>
@@ -34,12 +34,12 @@
                 @Html.DisplayFor(modelItem => item.DateOfCreation)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Institution.Id)
+                @Html.DisplayFor(modelItem => item.Institution.Name)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
             </td>
         </tr>
 }
